@@ -41,6 +41,9 @@ def action_print(reader, *args):
     else:
         raise RuntimeError("0 or 1 arguments expected for action 'print'")
 
+    if reader.print_header:
+        print(reader.header_line)
+
     for i, record in enumerate(reader, 1):
         print(record.to_message())
         if i == stop_after:
@@ -69,6 +72,10 @@ actions['ipset'] = action_ipset
 def action_findip(reader, *args):
     """Find Flow Log records involving a specific IP or IPs."""
     target_ips = set(args)
+
+    if reader.print_header:
+        print(reader.header_line)
+
     for record in reader:
         if (record.srcaddr in target_ips) or (record.dstaddr in target_ips):
             print(record.to_message())
@@ -131,6 +138,9 @@ def get_reader(args):
 
     if args.thread_count:
         kwargs['thread_count'] = args.thread_count
+
+    if args.print_header:
+        kwargs['print_header'] = args.print_header
 
     # Switch roles for access to another account
     if args.role_arn:
@@ -225,6 +235,11 @@ def main(argv=None):
         '--thread-count',
         type=int,
         help='number of threads used when reading'
+    )
+    parser.add_argument(
+        '--print-header',
+        help='include header line when printing records',
+        action='store_true'
     )
     args = parser.parse_args(argv)
 

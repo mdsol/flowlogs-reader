@@ -178,6 +178,7 @@ class BaseReader:
         end_time=None,
         boto_client_kwargs=None,
         boto_client=None,
+        print_header=None,
     ):
         # Get a boto3 client with which to perform queries
         if boto_client is not None:
@@ -194,6 +195,7 @@ class BaseReader:
 
         # Initialize the iterator
         self.iterator = self._reader()
+        self.print_header = print_header
 
     def _get_client(
         self, client_type, region_name, profile_name, boto_client_kwargs
@@ -222,6 +224,10 @@ class BaseReader:
 
     def __next__(self):
         return next(self.iterator)
+
+    @property
+    def header_line(self):
+        return ' '.join(FlowRecord.__slots__)
 
 
 class FlowLogsReader(BaseReader):
